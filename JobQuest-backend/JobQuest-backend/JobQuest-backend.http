@@ -1,0 +1,6 @@
+@JobQuest_backend_HostAddress = http://localhost:5082
+
+GET {{JobQuest_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
