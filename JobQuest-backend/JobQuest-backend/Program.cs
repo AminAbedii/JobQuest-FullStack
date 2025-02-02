@@ -1,3 +1,6 @@
+using JobQuest.DataLayer.Context;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -5,6 +8,22 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+
+
+#region DbContext
+string connString = builder.Configuration.GetConnectionString("JobQuestConnection");
+
+builder.Services.AddDbContext<JobQuestContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("JobQuestConnection"));
+
+});
+#endregion
+
+
+
 
 var app = builder.Build();
 
