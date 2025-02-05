@@ -13,12 +13,12 @@ namespace JobQuest.DataLayer.Entity
         [Key]
         public int CompanyId { get; set; }
         [ForeignKey("Role")]
-        public int RoleId { get; set; }
+        public int? RoleId { get; set; } = 2;
         public string CompanyName { get; set; }
         public string Password { get; set; }
         public string Description { get; set; }
         public string PicName { get; set; }
-        public DateTime RegisterDate { get; set; }
+        public DateTime? RegisterDate { get; set; } = DateTime.Now;
 
 
 
