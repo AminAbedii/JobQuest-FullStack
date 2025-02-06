@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.ComponentModel.Design;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace JobQuest_backend.Controllers
 {
@@ -40,8 +42,8 @@ namespace JobQuest_backend.Controllers
         [HttpPost("Login")]
         public async Task<ActionResult<string>> Login(LoginDto loginDto)
         {
-            var user = await ValidateUserCredentials(loginDto.CompanyName, loginDto.Password);
-            if (user == null)
+            var company = await ValidateUserCredentials(loginDto.CompanyName, loginDto.Password);
+            if (company == null)
             {
                 return Unauthorized();
             }
@@ -49,8 +51,14 @@ namespace JobQuest_backend.Controllers
                     Encoding.ASCII.GetBytes(_config["Authentication:SecretForKey"]));
             var signingCredentials = new SigningCredentials(
                 secururityKey, SecurityAlgorithms.HmacSha256);
-            var claimsForToken = new List<Claim>();
-            claimsForToken.Add(new Claim("companyName", loginDto.CompanyName));
+            //var claimsForToken = new List<Claim>();
+            //claimsForToken.Add(new Claim("companyName", loginDto.CompanyName));
+            var claimsForToken = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, company.CompanyName),
+                new Claim("CompanyId", company.CompanyId.ToString()) 
+            };
+
 
             var jwtSecurityToken = new JwtSecurityToken(
                 _config["Authentication:Issuer"],
@@ -65,7 +73,7 @@ namespace JobQuest_backend.Controllers
             return Ok(tokenToReturn);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize()]
         [HttpGet("ShowCompanies")]
         public async Task<ActionResult<IEnumerable<ShowCompaniesDto>>> ShowCompanies()
         {
